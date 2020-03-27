@@ -16,7 +16,9 @@ class interpolador:
         self.x1 = min(self.df.index, key=lambda a:abs(a-p))
         if p-self.x1>0: self.x2 = self.x_axis[self.x_axis.index(self.x1)+1]
         elif p-self.x1==0: self.x2 = self.x1
-        elif p-self.x1<0: self.x2 = self.x_axis[self.x_axis.index(self.x1)-1]
+        elif p-self.x1<0:
+            self.x2 = self.x1
+            self.x1 = self.x_axis[self.x_axis.index(self.x1)-1]
         self.y1 = self.y_axis[self.x_axis.index(self.x1)]
         self.y2 = self.y_axis[self.x_axis.index(self.x2)]
     
@@ -25,11 +27,17 @@ class interpolador:
         Função de interpolação exponencial flat forward
         """
         x1,x2,y1,y2,p,dc = self.x1, self.x2, self.y1, self.y2, self.p, self.dc
-        return ((((1+y1)**(x1/dc))*(((1+y2)**(x2/dc))/((1+y1)**(x1/dc)))**((p-x1)/(x2-x1)))**(dc/p))-1
+        if x1-x2!=0:
+            return ((((1+y1)**(x1/dc))*(((1+y2)**(x2/dc))/((1+y1)**(x1/dc)))**((p-x1)/(x2-x1)))**(dc/p))-1
+        else:
+            return y1
         
     def lin(self):
         """
         Função de interpolação linear nas taxas
         """
         x1,x2,y1,y2,p = self.x1, self.x2, self.y1, self.y2, self.p
-        return y1+(p-x1)*(y2-y1)/(x2-x1)
+        if x1-x2!=0:
+            return y1+(p-x1)*(y2-y1)/(x2-x1)
+        else:
+            return y1
